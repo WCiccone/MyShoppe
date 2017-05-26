@@ -60,15 +60,28 @@ namespace MyShop
             catch (Exception ex)
             {
                 await page.DisplayAlert("Uh Oh :(", $"Unable to remove {store?.Name ?? "Unknown"}, please try again: {ex.Message}", "OK");
-                Xamarin.Insights.Report(ex);
             }
             finally
             {
                 IsBusy = false;
             }
 
-           
-               
+
+
+        }
+
+        private Command forceRefreshCommand;
+        public Command ForceRefreshCommand
+        {
+            get
+            {
+                return forceRefreshCommand ??
+                    (forceRefreshCommand = new Command(async () =>
+                    {
+                        ForceSync = true;
+                        await ExecuteGetStoresCommand();
+                    }));
+            }
         }
 
         private Command getStoresCommand;
@@ -106,7 +119,7 @@ namespace MyShop
             catch (Exception ex)
             {
                 showAlert = true;
-                Xamarin.Insights.Report(ex);
+
             }
             finally
             {
